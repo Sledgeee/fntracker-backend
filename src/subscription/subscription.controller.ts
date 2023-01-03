@@ -1,4 +1,4 @@
-import { Controller, Delete, Param, Post } from '@nestjs/common'
+import { Controller, Delete, Get, Param, Post } from '@nestjs/common'
 import { SubscriptionService } from './subscription.service'
 import { GetUserId } from '../common/decorators'
 
@@ -6,13 +6,18 @@ import { GetUserId } from '../common/decorators'
 export class SubscriptionController {
 	constructor(private readonly subscriptionService: SubscriptionService) {}
 
+	@Get('all')
+	async getUserSubscriptions(@GetUserId() userId) {
+		return this.subscriptionService.getSubscriptions(userId)
+	}
+
 	@Post('add/:shopItemId')
-	getProductsByCategory(@GetUserId() userId, @Param() params) {
+	async getProductsByCategory(@GetUserId() userId, @Param() params) {
 		return this.subscriptionService.subscribe(userId, params.shopItemId)
 	}
 
 	@Delete('remove/:shopItemId')
-	searchProducts(@GetUserId() userId, @Param() params) {
+	async searchProducts(@GetUserId() userId, @Param() params) {
 		return this.subscriptionService.unsubscribe(userId, params.shopItemId)
 	}
 }

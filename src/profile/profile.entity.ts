@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, OneToOne } from 'typeorm'
 import { Base } from '../utils'
 import { UserEntity } from '../user/user.entity'
 
-@Entity('Profile')
+@Entity('profile')
 export class ProfileEntity extends Base {
 	@OneToOne(() => UserEntity, user => user.id)
 	@JoinColumn({ name: 'user_id' })

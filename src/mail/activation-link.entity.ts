@@ -1,7 +1,7 @@
 import { Base } from '../utils'
 import { Column, Entity } from 'typeorm'
 
-@Entity('ActivationLink')
+@Entity('activation_link')
 export class ActivationLinkEntity extends Base {
 	@Column({ name: 'user_id' })
 	userId: number

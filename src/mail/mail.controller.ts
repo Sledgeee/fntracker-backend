@@ -12,7 +12,7 @@ export class MailController {
 	) {}
 
 	@Get('smtp/activate/resend')
-	smtpResendActivationLink(
+	async smtpResendActivationLink(
 		@GetUser('email') email: string,
 		@I18n() i18n: I18nContext,
 		@GetUserId() userId: number,
@@ -31,7 +31,7 @@ export class MailController {
 	}
 
 	@Get('sd/activate/resend')
-	sendGridResendActivationLink(
+	async sendGridResendActivationLink(
 		@GetUser('email') email: string,
 		@I18n() i18n: I18nContext,
 		@GetUserId() userId: number,

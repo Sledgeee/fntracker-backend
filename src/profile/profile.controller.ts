@@ -1,19 +1,25 @@
-import { Body, Controller, Get, Patch } from '@nestjs/common'
-import { GetUser, Public } from '../common/decorators'
+import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common'
+import { GetUserId, Public } from '../common/decorators'
 import { ProfileService } from './profile.service'
+import { UpdateProfileDto } from './update-profile.dto'
 
-@Public()
 @Controller('profile')
 export class ProfileController {
 	constructor(private readonly profileService: ProfileService) {}
 
-	@Get()
-	getProfile(@GetUser() user) {
-		return this.profileService.getProfile(user)
+	@Public()
+	@Get(':egsId')
+	async getProfile(@Param() params) {
+		return this.profileService.getProfile(params.egsId)
 	}
 
 	@Patch()
-	updateProfileImage(@GetUser() user, @Body() avatar: string) {
-		return this.profileService.updateProfileImage(user, avatar)
+	async updateProfile(@GetUserId() userId, @Body() dto: UpdateProfileDto) {
+		return this.profileService.updateProfileImage(userId, dto)
+	}
+
+	@Patch('views/increment')
+	async incrementViews(@Query() query) {
+		return this.profileService.incrementViews(query.egsId)
 	}
 }

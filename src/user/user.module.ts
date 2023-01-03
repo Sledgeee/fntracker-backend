@@ -6,10 +6,16 @@ import { UserEntity } from './user.entity'
 import { ActivationLinkEntity } from '../mail/activation-link.entity'
 import { ConfigModule } from '@nestjs/config'
 import { ProfileEntity } from '../profile/profile.entity'
+import { UserSocialNetworksEntity } from '../user-social-networks/user-social-networks.entity'
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([UserEntity, ProfileEntity, ActivationLinkEntity]),
+		TypeOrmModule.forFeature([
+			UserEntity,
+			ProfileEntity,
+			ActivationLinkEntity,
+			UserSocialNetworksEntity
+		]),
 		ConfigModule
 	],
 	controllers: [UserController],

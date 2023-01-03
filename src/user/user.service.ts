@@ -8,6 +8,7 @@ import { ProfileEntity } from '../profile/profile.entity'
 import { I18nContext } from 'nestjs-i18n'
 import { Response } from 'express'
 import { ConfigService } from '@nestjs/config'
+import { ActivateDto } from './activate-dto'
 
 @Injectable()
 export class UserService {
@@ -22,20 +23,13 @@ export class UserService {
 		private readonly configService: ConfigService
 	) {}
 
-	async activateUser(
-		userId: number,
-		activationUid: string,
-		egsId: string,
-		country: string,
-		i18n: I18nContext,
-		res: Response
-	) {
-		const user = await this.userRepository.findOneBy({ id: userId })
-		const aLink = await this.alRepository.findOneBy({ userId: userId })
+	async activateUser(dto: ActivateDto, i18n: I18nContext, res: Response) {
+		const user = await this.userRepository.findOneBy({ id: dto.uid })
+		const aLink = await this.alRepository.findOneBy({ userId: dto.uid })
 
 		if (!user) throw new BadRequestException(i18n.t('api-user.AccountDeleted'))
 		if (!aLink) throw new BadRequestException('api-user.AccountActivated')
-		if (aLink.uid !== activationUid)
+		if (aLink.uid !== dto.al)
 			throw new BadRequestException(i18n.t('api-user.IncorrectActivationLink'))
 
 		const createdDate = dayjs(aLink.createdAt)
@@ -48,9 +42,9 @@ export class UserService {
 
 		const profile = this.profileRepository.create({
 			user: user,
-			egsId: egsId,
+			egsId: dto.egsId,
 			viewsCount: 0,
-			country: country
+			country: dto.country
 		})
 		await this.profileRepository.save(profile)
 		return res.redirect(
@@ -63,7 +57,7 @@ export class UserService {
 			where: {
 				id: id
 			},
-			relations: ['profile', 'subscriptions']
+			relations: ['profile', 'subscriptions', 'socialNetworks']
 		})
 	}
 }

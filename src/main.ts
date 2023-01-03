@@ -3,16 +3,17 @@ import { AppModule } from './app.module'
 import * as cookieParser from 'cookie-parser'
 import { ValidationPipe } from '@nestjs/common'
 import * as dayjs from 'dayjs'
+import { NestFastifyApplication } from '@nestjs/platform-fastify'
 
 require('dotenv').config({
 	path: `.env`
 })
 
 async function bootstrap() {
-	const app = await NestFactory.create(AppModule)
+	const app = await NestFactory.create<NestFastifyApplication>(AppModule)
 	app.enableCors({
 		credentials: true,
-		origin: [process.env.CORS_DOMAIN, 'localhost']
+		origin: [process.env.CLIENT_URL, 'http://localhost:3000']
 	})
 	app.use(cookieParser())
 	app.useGlobalPipes(new ValidationPipe())

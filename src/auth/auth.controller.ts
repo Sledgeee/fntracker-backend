@@ -1,13 +1,4 @@
-import {
-	Body,
-	Controller,
-	HttpCode,
-	HttpStatus,
-	Inject,
-	Post,
-	Req,
-	Res
-} from '@nestjs/common'
+import { Body, Controller, Inject, Post, Req, Res } from '@nestjs/common'
 import { AuthService } from './auth.service'
 import { AuthDto, RegisterDto } from './dto'
 import { AuthResponse } from './types'
@@ -25,7 +16,6 @@ export class AuthController {
 		@Inject(UserService) private readonly userService: UserService
 	) {}
 
-	@HttpCode(HttpStatus.CREATED)
 	@Public()
 	@Post('register')
 	async register(
@@ -45,7 +35,6 @@ export class AuthController {
 		}
 	}
 
-	@HttpCode(HttpStatus.OK)
 	@Public()
 	@Post('login')
 	async login(
@@ -62,7 +51,6 @@ export class AuthController {
 		}
 	}
 
-	@HttpCode(HttpStatus.OK)
 	@Post('logout')
 	async logout(
 		@GetUserId() userId: number,
@@ -72,7 +60,6 @@ export class AuthController {
 		this.authService.clearCookie(response)
 	}
 
-	@HttpCode(HttpStatus.OK)
 	@Public()
 	@Post('refresh')
 	async refresh(

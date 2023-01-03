@@ -10,6 +10,12 @@ export class SubscriptionService {
 		private readonly subscriptionRepository: Repository<SubscriptionEntity>
 	) {}
 
+	async getSubscriptions(userId) {
+		return await this.subscriptionRepository.findBy({
+			user: userId
+		})
+	}
+
 	async subscribe(userId, shopItemId: string) {
 		const candidate = await this.subscriptionRepository.findOneBy({
 			user: userId,

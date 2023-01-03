@@ -14,6 +14,7 @@ import { ProfileModule } from './profile'
 import { CookieResolver, I18nModule } from 'nestjs-i18n'
 import { PrModule } from './pr'
 import * as path from 'path'
+import { UserSocialNetworksModule } from './user-social-networks'
 
 @Module({
 	imports: [
@@ -39,7 +40,8 @@ import * as path from 'path'
 		AuthModule,
 		MailModule,
 		ProfileModule,
-		PrModule
+		PrModule,
+		UserSocialNetworksModule
 	],
 	providers: [
 		AppService,

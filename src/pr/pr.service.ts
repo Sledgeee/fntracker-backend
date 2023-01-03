@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import axios from 'axios'
+import { GetPrDto } from './get-pr.dto'
 
 @Injectable()
 export class PrService {
@@ -8,12 +9,12 @@ export class PrService {
 		@Inject(ConfigService) private readonly configService: ConfigService
 	) {}
 
-	async getPr(platform, region, egsName) {
+	async getPr(dto: GetPrDto) {
 		const response = await axios.get(
 			encodeURI(
-				`${this.configService.get(
-					'TRN_API_URL'
-				)}/${platform}/${region}/${egsName}`
+				`${this.configService.get('TRN_API_URL')}/${dto.platform}/${
+					dto.region
+				}/${dto.egsName}`
 			),
 			{
 				headers: {
