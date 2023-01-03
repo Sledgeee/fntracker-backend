@@ -5,7 +5,7 @@ import { ValidationPipe } from '@nestjs/common'
 import * as dayjs from 'dayjs'
 
 require('dotenv').config({
-	path: `${process.env.NODE_ENV}.env`
+	path: `.env`
 })
 
 async function bootstrap() {
