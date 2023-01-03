@@ -12,7 +12,7 @@ async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 	app.enableCors({
 		credentials: true,
-		origin: process.env.CLIENT_URL
+		origin: [process.env.CORS_DOMAIN, 'localhost']
 	})
 	app.use(cookieParser())
 	app.useGlobalPipes(new ValidationPipe())

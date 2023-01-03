@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { SubscriptionEntity } from './subscription.entity'
 import { Repository } from 'typeorm'
@@ -11,6 +11,11 @@ export class SubscriptionService {
 	) {}
 
 	async subscribe(userId, shopItemId: string) {
+		const candidate = await this.subscriptionRepository.findOneBy({
+			user: userId,
+			shopItemId: shopItemId
+		})
+		if (candidate) throw new BadRequestException('')
 		const subscription = await this.subscriptionRepository.create({
 			shopItemId: shopItemId,
 			user: userId

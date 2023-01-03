@@ -14,6 +14,12 @@ export class ProfileEntity extends Base {
 	@Column({ name: 'views_count' })
 	viewsCount: number
 
-	@Column({ nullable: false })
+	@Column({ nullable: true })
 	country: string
+
+	@Column({ nullable: true })
+	avatar: string
+
+	@Column({ nullable: true })
+	fullName: string
 }
