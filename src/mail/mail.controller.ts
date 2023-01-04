@@ -1,8 +1,9 @@
-import { Controller, Get } from '@nestjs/common'
+import { Controller, Get, Query } from '@nestjs/common'
 import { MailSmtpService } from './mail-smtp.service'
-import { GetUser, GetUserId } from '../common/decorators'
+import { GetUser, GetUserId, Public } from '../common/decorators'
 import { I18n, I18nContext } from 'nestjs-i18n'
 import { MailSendgridService } from './mail-sendgrid.service'
+import { JwtPayload } from '../auth/types'
 
 @Controller('mail')
 export class MailController {
@@ -12,17 +13,16 @@ export class MailController {
 	) {}
 
 	@Get('smtp/activate/resend')
-	async smtpResendActivationLink(
-		@GetUser('email') email: string,
+	async smtpResendActivateMail(
+		@GetUser() user: JwtPayload,
 		@I18n() i18n: I18nContext,
-		@GetUserId() userId: number,
-		isVerified: boolean = false
+		@GetUserId() userId: number
 	) {
-		return isVerified
+		return user.isVerified
 			? i18n.t('api-user.AccountActivated')
 			: this.mailSmtpService.sendActivationMail(
 					userId,
-					email,
+					user.email,
 					'',
 					'',
 					i18n,
@@ -31,21 +31,32 @@ export class MailController {
 	}
 
 	@Get('sd/activate/resend')
-	async sendGridResendActivationLink(
-		@GetUser('email') email: string,
+	async sdResendActivateMail(
+		@GetUser() user: JwtPayload,
 		@I18n() i18n: I18nContext,
-		@GetUserId() userId: number,
-		isVerified: boolean = false
+		@GetUserId() userId: number
 	) {
-		return isVerified
+		return user.isVerified
 			? i18n.t('api-user.AccountActivated')
 			: this.mailSendGridService.sendActivationMail(
 					userId,
-					email,
+					user.email,
 					'',
 					'',
 					i18n,
 					true
 			  )
+	}
+
+	@Public()
+	@Get('smtp/recovery')
+	async smtpSendRecoveryMail(@Query() query, @I18n() i18n: I18nContext) {
+		return this.mailSmtpService.sendResetMail(query.email, i18n)
+	}
+
+	@Public()
+	@Get('sd/recovery')
+	async sdSendRecoveryMail(@Query() query, @I18n() i18n: I18nContext) {
+		return this.mailSendGridService.sendResetMail(query.email, i18n)
 	}
 }

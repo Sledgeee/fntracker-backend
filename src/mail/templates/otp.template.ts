@@ -1,11 +1,11 @@
 import * as dayjs from 'dayjs'
 
-export const activateTemplate = (
+export const otpTemplate = (
 	appUrl,
 	appName,
 	link,
 	text,
-	activateAccount,
+	resetPassword,
 	problem,
 	automaticMail,
 	rights
@@ -31,7 +31,6 @@ export const activateTemplate = (
 										<tbody>
 											<tr>
 												<td style="font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;padding:35px">
-   					                    
 													<p style='margin-top:0;color:#74787e;font-size:16px;line-height:1.5em'>
 														${text}
 													</p>
@@ -40,7 +39,7 @@ export const activateTemplate = (
 															<tr>
 																<td align='center'>
 																	<a href='${link}' style="font-family:Arial,'Helvetica Neue',Helvetica,sans-serif;display:block;display:inline-block;width:200px;min-height:20px;padding:10px;background-color:#3869d4;border-radius:3px;color:#ffffff;font-size:15px;line-height:25px;text-align:center;text-decoration:none;background-color:#3869d4" target='_blank'>
-																		${activateAccount}
+																		${resetPassword}
 																	</a>
 																</td>
 															</tr>

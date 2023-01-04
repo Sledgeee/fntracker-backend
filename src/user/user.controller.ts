@@ -1,9 +1,8 @@
-import { Controller, Get, Query, Res } from '@nestjs/common'
+import { Controller, Get, Query } from '@nestjs/common'
 import { UserService } from './user.service'
 import { GetUserId, Public } from '../common/decorators'
-import { UserEntity } from './user.entity'
 import { I18n, I18nContext } from 'nestjs-i18n'
-import { ActivateDto } from './activate-dto'
+import { ActivateDto } from './dto'
 
 @Controller('user')
 export class UserController {
@@ -11,16 +10,12 @@ export class UserController {
 
 	@Public()
 	@Get('activate')
-	async activateUser(
-		@Query() dto: ActivateDto,
-		@Res() res,
-		@I18n() i18n: I18nContext
-	) {
-		return await this.userService.activateUser(dto, i18n, res)
+	async activateUser(@Query() dto: ActivateDto, @I18n() i18n: I18nContext) {
+		return await this.userService.activateUser(dto, i18n)
 	}
 
 	@Get()
-	async getUser(@GetUserId() id: number): Promise<UserEntity> {
+	async getUser(@GetUserId() id: number) {
 		return this.userService.getProfile(id)
 	}
 }

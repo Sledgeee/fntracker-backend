@@ -1,6 +1,6 @@
 import { Body, Controller, Inject, Post, Req, Res } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { AuthDto, RegisterDto } from './dto'
+import { AuthDto, RecoveryDto, RegisterDto } from './dto'
 import { AuthResponse } from './types'
 import { GetUserId, Public } from '../common/decorators'
 import { Response } from 'express'
@@ -67,11 +67,19 @@ export class AuthController {
 		@I18n() i18n: I18nContext,
 		@Res({ passthrough: true }) response: Response
 	) {
-		const { refreshToken } = req.cookies
-		const refreshResponse = await this.authService.refresh(refreshToken, i18n)
+		const refreshResponse = await this.authService.refresh(
+			req.cookies['fntracker-rt'],
+			i18n
+		)
 		this.authService.setCookie(response, refreshResponse.refreshToken)
 		return {
 			accessToken: refreshResponse.accessToken
 		}
+	}
+
+	@Public()
+	@Post('recovery')
+	async recovery(@Body() dto: RecoveryDto) {
+		return this.authService.recovery(dto)
 	}
 }

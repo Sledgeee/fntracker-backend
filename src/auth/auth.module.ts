@@ -7,11 +7,12 @@ import { UserEntity } from '../user/user.entity'
 import { AtStrategy } from './strategies'
 import { JwtModule } from '@nestjs/jwt'
 import { ActivationLinkEntity } from '../mail/activation-link.entity'
-import { ProfileEntity } from '../profile/profile.entity'
+import { ProfileEntity } from '../profile/entities/profile.entity'
 import { I18nContext } from 'nestjs-i18n'
 import { UserService } from '../user'
 import { MailSendgridService } from '../mail/mail-sendgrid.service'
 import { MailHelperService } from '../mail/mail-helper.service'
+import { OtpEntity } from '../otp/otp.entity'
 
 @Module({
 	controllers: [AuthController],
@@ -25,7 +26,12 @@ import { MailHelperService } from '../mail/mail-helper.service'
 	],
 	imports: [
 		ConfigModule,
-		TypeOrmModule.forFeature([UserEntity, ActivationLinkEntity, ProfileEntity]),
+		TypeOrmModule.forFeature([
+			UserEntity,
+			ActivationLinkEntity,
+			ProfileEntity,
+			OtpEntity
+		]),
 		JwtModule.register({})
 	]
 })

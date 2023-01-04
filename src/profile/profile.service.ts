@@ -4,15 +4,18 @@ import {
 	NotFoundException
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { ProfileEntity } from './profile.entity'
+import { ProfileEntity } from './entities/profile.entity'
 import { Repository } from 'typeorm'
-import { UpdateProfileDto } from './update-profile.dto'
+import { UpdateProfileDto, UpdateSocialNetworksDto } from './dto'
+import { ProfileSocialNetworksEntity } from './entities/profile-social-networks.entity'
 
 @Injectable()
 export class ProfileService {
 	constructor(
 		@InjectRepository(ProfileEntity)
-		private readonly profileRepository: Repository<ProfileEntity>
+		private readonly profileRepository: Repository<ProfileEntity>,
+		@InjectRepository(ProfileSocialNetworksEntity)
+		private readonly profileSnRepository: Repository<ProfileSocialNetworksEntity>
 	) {}
 
 	async getProfile(egsId) {
@@ -21,10 +24,10 @@ export class ProfileService {
 		return profile
 	}
 
-	async updateProfileImage(userId, dto: UpdateProfileDto) {
+	async updateProfile(userId, dto: UpdateProfileDto) {
 		const profile = await this.profileRepository.findOneBy({ user: userId })
 		if (!profile) throw new BadRequestException('Profile doest not exists')
-		if (!dto) throw new BadRequestException('Empty object passed')
+		if (!dto) throw new BadRequestException('Empty object is passed')
 		profile.country = dto.country
 		profile.avatar = dto.avatar
 		profile.fullName = dto.fullName
@@ -42,5 +45,15 @@ export class ProfileService {
 		}
 		profile.viewsCount += 1
 		return await this.profileRepository.save(profile)
+	}
+
+	async updateProfileSocialNetworks(userId, dto: UpdateSocialNetworksDto) {
+		const profile = await this.profileRepository.findOneBy({ user: userId })
+		if (!profile) throw new BadRequestException('Profile not found')
+		const sn = this.profileSnRepository.create({
+			profile: profile,
+			...dto
+		})
+		return await this.profileSnRepository.save(sn)
 	}
 }

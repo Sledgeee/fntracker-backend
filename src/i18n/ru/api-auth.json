@@ -1,6 +1,1 @@
-{
-  "EmailAlreadyTaken": "Указаный почтовый ящик уже используется",
-  "IncorrectEmailOrPassword": "Некорректный логин либо пароль",
-  "AccessDenied": "Отказано в доступе",
-  "EgsIdAlreadyTaken": "Учетная запись с указаным Epic Games именем уже существует"
-}
+{"AccessDenied":"Отказано в доступе","EgsIdAlreadyTaken":"Учетная запись с указаным Epic Games именем уже существует","EmailAlreadyTaken":"Указаный почтовый ящик уже используется","IncorrectEmailOrPassword":"Некорректный логин либо пароль"}

@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { activate } from './templates'
+import { activateTemplate, otpTemplate } from './templates'
 import * as SendGrid from '@sendgrid/mail'
 import { I18nContext } from 'nestjs-i18n'
 import { MailHelperService } from './mail-helper.service'
@@ -16,12 +16,12 @@ export class MailSendgridService {
 	}
 
 	async sendActivationMail(
-		userId,
-		to,
-		egsId,
-		country,
+		userId: number,
+		to: string,
+		egsId: string,
+		country: string,
 		i18n: I18nContext,
-		isResend = false
+		isResend: boolean = false
 	) {
 		const al = await this.mailHelperService.createActivationLink(
 			userId,
@@ -30,29 +30,59 @@ export class MailSendgridService {
 			isResend
 		)
 		const link = `${this.configService.get(
-			'API_URL'
+			'CLIENT_URL'
 		)}/user/activate?uid=${userId}&al=${al}`
+		new Promise(() =>
+			SendGrid.send({
+				from: this.configService.get<string>('SEND_GRID_MAIL_BOX'),
+				to: to,
+				subject: `${i18n.t(
+					'api-email.AccountActivation'
+				)} - ${this.configService.get('APP_NAME')}`,
+				html: activateTemplate(
+					this.configService.get('CLIENT_URL'),
+					this.configService.get('APP_NAME'),
+					link,
+					!isResend
+						? i18n.t('api-email.FinishRegister')
+						: i18n.t('api-email.NewActivateAccountMail'),
+					i18n.t('api-email.ActivateAccount'),
+					i18n.t('api-email.ProblemActivate'),
+					i18n.t('api-email.AutomaticMail'),
+					i18n.t('api-email.Rights')
+				)
+			})
+		)
+	}
 
-		const mail = {
-			from: this.configService.get('SEND_GRID_MAIL_BOX'),
-			to: to,
-			subject: `${i18n.t(
-				'api-email.AccountActivation'
-			)} - ${this.configService.get('APP_NAME')}`,
-			html: activate(
-				this.configService.get('CLIENT_URL'),
-				this.configService.get('APP_NAME'),
-				link,
-				!isResend
-					? i18n.t('api-email.FinishRegister')
-					: i18n.t('api-email.NewMail'),
-				i18n.t('api-email.ActivateAccount'),
-				i18n.t('api-email.Regards'),
-				i18n.t('api-email.Problem'),
-				i18n.t('api-email.AutomaticMail'),
-				i18n.t('api-email.Rights')
-			)
-		}
-		await SendGrid.send(mail)
+	async sendResetMail(
+		email: string,
+		i18n: I18nContext,
+		isResend: boolean = false
+	) {
+		const link = `${this.configService.get(
+			'CLIENT_URL'
+		)}/${await this.mailHelperService.createRecoveryLink(email)}`
+		new Promise(() =>
+			SendGrid.send({
+				from: this.configService.get<string>('SEND_GRID_MAIL_BOX'),
+				to: email,
+				subject: `${i18n.t(
+					'api-email.PasswordResetting'
+				)} - ${this.configService.get('APP_NAME')}`,
+				html: otpTemplate(
+					this.configService.get('CLIENT_URL'),
+					this.configService.get('APP_NAME'),
+					link,
+					!isResend
+						? i18n.t('api-email.PasswordResetting')
+						: i18n.t('api-email.NewResetPasswordMail'),
+					i18n.t('api-email.ResetPassword'),
+					i18n.t('api-email.ProblemReset'),
+					i18n.t('api-email.AutomaticMail'),
+					i18n.t('api-email.Rights')
+				)
+			})
+		)
 	}
 }

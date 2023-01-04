@@ -1,4 +1,4 @@
 export * from './profile.controller'
 export * from './profile.module'
 export * from './profile.service'
-export * from './update-profile.dto'
+export * from './dto/update-profile.dto'

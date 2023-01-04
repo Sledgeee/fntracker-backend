@@ -1,8 +1,7 @@
-import { Column, Entity, JoinColumn, OneToMany, OneToOne } from 'typeorm'
+import { Column, Entity, OneToMany, OneToOne } from 'typeorm'
 import { Base } from '../utils'
 import { SubscriptionEntity } from '../subscription/subscription.entity'
-import { ProfileEntity } from '../profile/profile.entity'
-import { UserSocialNetworksEntity } from '../user-social-networks/user-social-networks.entity'
+import { ProfileEntity } from '../profile/entities/profile.entity'
 
 @Entity('user')
 export class UserEntity extends Base {
@@ -23,8 +22,4 @@ export class UserEntity extends Base {
 
 	@OneToMany(() => SubscriptionEntity, subscription => subscription.user)
 	subscriptions: SubscriptionEntity[]
-
-	@OneToOne(() => UserSocialNetworksEntity, linkedAccount => linkedAccount.user)
-	@JoinColumn({ name: 'social_networks' })
-	socialNetworks: UserSocialNetworksEntity
 }

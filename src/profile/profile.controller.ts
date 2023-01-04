@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Param, Patch, Query } from '@nestjs/common'
+import { Body, Controller, Get, Param, Patch } from '@nestjs/common'
 import { GetUserId, Public } from '../common/decorators'
 import { ProfileService } from './profile.service'
-import { UpdateProfileDto } from './update-profile.dto'
+import { UpdateProfileDto, UpdateSocialNetworksDto } from './dto'
 
 @Controller('profile')
 export class ProfileController {
@@ -15,11 +15,20 @@ export class ProfileController {
 
 	@Patch()
 	async updateProfile(@GetUserId() userId, @Body() dto: UpdateProfileDto) {
-		return this.profileService.updateProfileImage(userId, dto)
+		return this.profileService.updateProfile(userId, dto)
 	}
 
-	@Patch('views/increment')
-	async incrementViews(@Query() query) {
-		return this.profileService.incrementViews(query.egsId)
+	@Public()
+	@Patch(':egsId/increment')
+	async incrementViews(@Param() params) {
+		return this.profileService.incrementViews(params.egsId)
+	}
+
+	@Patch('sn')
+	async updateSocialNetworks(
+		@GetUserId() userId,
+		@Body() dto: UpdateSocialNetworksDto
+	) {
+		return this.profileService.updateProfileSocialNetworks(userId, dto)
 	}
 }

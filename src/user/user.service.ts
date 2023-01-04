@@ -1,14 +1,18 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common'
+import {
+	BadRequestException,
+	HttpStatus,
+	Inject,
+	Injectable
+} from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { UserEntity } from './user.entity'
 import { Repository } from 'typeorm'
 import { ActivationLinkEntity } from '../mail/activation-link.entity'
 import * as dayjs from 'dayjs'
-import { ProfileEntity } from '../profile/profile.entity'
+import { ProfileEntity } from '../profile/entities/profile.entity'
 import { I18nContext } from 'nestjs-i18n'
-import { Response } from 'express'
 import { ConfigService } from '@nestjs/config'
-import { ActivateDto } from './activate-dto'
+import { ActivateDto } from './dto'
 
 @Injectable()
 export class UserService {
@@ -23,7 +27,7 @@ export class UserService {
 		private readonly configService: ConfigService
 	) {}
 
-	async activateUser(dto: ActivateDto, i18n: I18nContext, res: Response) {
+	async activateUser(dto: ActivateDto, i18n: I18nContext) {
 		const user = await this.userRepository.findOneBy({ id: dto.uid })
 		const aLink = await this.alRepository.findOneBy({ userId: dto.uid })
 
@@ -47,9 +51,7 @@ export class UserService {
 			country: dto.country
 		})
 		await this.profileRepository.save(profile)
-		return res.redirect(
-			`${this.configService.get('CLIENT_URL')}/user/activation?status=200`
-		)
+		return HttpStatus.OK
 	}
 
 	async getProfile(id: number): Promise<UserEntity> {
@@ -57,7 +59,7 @@ export class UserService {
 			where: {
 				id: id
 			},
-			relations: ['profile', 'subscriptions', 'socialNetworks']
+			relations: ['profile', 'profile.socialNetworks', 'subscriptions']
 		})
 	}
 }

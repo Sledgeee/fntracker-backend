@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { UserEntity } from '../user/user.entity'
 import { IsNull, Not, Repository } from 'typeorm'
 import { JwtService } from '@nestjs/jwt'
-import { AuthDto, RegisterDto } from './dto'
+import { AuthDto, RecoveryDto, RegisterDto } from './dto'
 import * as bcrypt from 'bcrypt'
 import { AuthResponse } from './types'
 import { ConfigService } from '@nestjs/config'
@@ -17,8 +17,9 @@ import { Buffer } from 'buffer'
 import { verify } from 'jsonwebtoken'
 import { Response } from 'express'
 import { I18nContext } from 'nestjs-i18n'
-import { ProfileEntity } from '../profile/profile.entity'
+import { ProfileEntity } from '../profile/entities/profile.entity'
 import { MailSendgridService } from '../mail/mail-sendgrid.service'
+import { OtpEntity } from '../otp/otp.entity'
 
 @Injectable()
 export class AuthService {
@@ -32,7 +33,9 @@ export class AuthService {
 		@Inject(MailSendgridService)
 		private readonly mailService: MailSendgridService,
 		@InjectRepository(ProfileEntity)
-		private readonly profileRepository: Repository<ProfileEntity>
+		private readonly profileRepository: Repository<ProfileEntity>,
+		@InjectRepository(OtpEntity)
+		private readonly otpRepository: Repository<OtpEntity>
 	) {}
 
 	async register(dto: RegisterDto, i18n: I18nContext): Promise<AuthResponse> {
@@ -49,7 +52,11 @@ export class AuthService {
 		})
 		await this.userRepository.save(newUser)
 
-		const tokens = await this.getTokens(newUser.id, newUser.email)
+		const tokens = await this.getTokens(
+			newUser.id,
+			newUser.email,
+			newUser.isVerified
+		)
 		newUser.hashedRt = await this.getHash(tokens.refreshToken)
 		await this.userRepository.save(newUser)
 
@@ -59,12 +66,14 @@ export class AuthService {
 		if (egsIdCandidate)
 			throw new BadRequestException(i18n.t('api-auth.EgsIdAlreadyTaken'))
 
-		this.mailService.sendActivationMail(
-			newUser.id,
-			newUser.email,
-			dto.egsId,
-			dto.country,
-			i18n
+		new Promise(() =>
+			this.mailService.sendActivationMail(
+				newUser.id,
+				newUser.email,
+				dto.egsId,
+				dto.country,
+				i18n
+			)
 		)
 		return {
 			userId: newUser.id,
@@ -86,7 +95,7 @@ export class AuthService {
 		if (!passwordMatches)
 			throw new ForbiddenException(i18n.t('api-auth.IncorrectEmailOrPassword'))
 
-		const tokens = await this.getTokens(user.id, user.email)
+		const tokens = await this.getTokens(user.id, user.email, user.isVerified)
 
 		await this.updateRtHash(user.id, tokens.refreshToken)
 		return {
@@ -122,7 +131,7 @@ export class AuthService {
 		if (!rtMatches)
 			throw new ForbiddenException(i18n.t('api-auth.AccessDenied'))
 
-		const tokens = await this.getTokens(user.id, user.email)
+		const tokens = await this.getTokens(user.id, user.email, user.isVerified)
 		await this.updateRtHash(user.id, tokens.refreshToken)
 		return tokens
 	}
@@ -140,12 +149,13 @@ export class AuthService {
 		)
 	}
 
-	async getTokens(userId: number, email: string) {
+	async getTokens(userId: number, email: string, isVerified: boolean) {
 		const [at, rt] = await Promise.all([
 			this.jwtService.signAsync(
 				{
-					sub: userId,
-					email
+					sub: userId.toString(),
+					email,
+					isVerified
 				},
 				{
 					secret: this.configService.get('JWT_AT_SECRET'),
@@ -167,6 +177,24 @@ export class AuthService {
 			accessToken: at,
 			refreshToken: rt
 		}
+	}
+
+	async recovery(dto: RecoveryDto) {
+		if (!dto) throw new BadRequestException('Empty object is passed')
+		const user = await this.userRepository.findOneBy({
+			id: dto.uid,
+			email: dto.email
+		})
+		if (!user) throw new BadRequestException('User not found')
+		const otp = await this.otpRepository.findOneBy({
+			id: dto.recid,
+			otp: dto.otp,
+			userId: user.id
+		})
+		if (!otp) throw new BadRequestException('Incorrect recovery link')
+		user.isVerified = true
+		user.password = await bcrypt.hash(dto.password, await bcrypt.genSalt(10))
+		return this.userRepository.save(user)
 	}
 
 	setCookie(response: Response, refreshToken: string) {
