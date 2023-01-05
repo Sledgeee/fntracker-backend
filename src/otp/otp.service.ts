@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { OtpEntity } from './otp.entity'
 import { Repository } from 'typeorm'
 import { VerifyOtpDto } from './dto/verify-otp.dto'
+import dayjs from 'dayjs'
 
 @Injectable()
 export class OtpService {
@@ -18,6 +19,9 @@ export class OtpService {
 			userId: dto.userId
 		})
 		if (!otp) throw new BadRequestException('Otp not found')
+		const createdDate = dayjs(otp.createdAt)
+		if (createdDate.diff(dayjs(), 'minutes', false) >= 30)
+			throw new BadRequestException('Otp overdue')
 		return HttpStatus.OK
 	}
 }
