@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common'
+import { HttpStatus, Inject, Injectable } from '@nestjs/common'
 import { createTransport, Transporter } from 'nodemailer'
 import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
@@ -78,26 +78,25 @@ export class MailSmtpService {
 		const link = `${this.configService.get(
 			'CLIENT_URL'
 		)}/${await this.mailHelperService.createRecoveryLink(email)}`
-		return new Promise(() =>
-			this.transporter.sendMail({
-				from: this.configService.get<string>('SEND_GRID_MAIL_BOX'),
-				to: email,
-				subject: `${i18n.t(
-					'api-email.PasswordResetting'
-				)} - ${this.configService.get('APP_NAME')}`,
-				html: otpTemplate(
-					this.configService.get('CLIENT_URL'),
-					this.configService.get('APP_NAME'),
-					link,
-					!isResend
-						? i18n.t('api-email.PasswordResetting')
-						: i18n.t('api-email.NewResetPasswordMail'),
-					i18n.t('api-email.ResetPassword'),
-					i18n.t('api-email.ProblemReset'),
-					i18n.t('api-email.AutomaticMail'),
-					i18n.t('api-email.Rights')
-				)
-			})
-		)
+		await this.transporter.sendMail({
+			from: this.configService.get<string>('SEND_GRID_MAIL_BOX'),
+			to: email,
+			subject: `${i18n.t(
+				'api-email.PasswordResetting'
+			)} - ${this.configService.get('APP_NAME')}`,
+			html: otpTemplate(
+				this.configService.get('CLIENT_URL'),
+				this.configService.get('APP_NAME'),
+				link,
+				!isResend
+					? i18n.t('api-email.PasswordResetting')
+					: i18n.t('api-email.NewResetPasswordMail'),
+				i18n.t('api-email.ResetPassword'),
+				i18n.t('api-email.ProblemReset'),
+				i18n.t('api-email.AutomaticMail'),
+				i18n.t('api-email.Rights')
+			)
+		})
+		return HttpStatus.OK
 	}
 }
