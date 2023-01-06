@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { OtpEntity } from './otp.entity'
 import { Repository } from 'typeorm'
 import { VerifyOtpDto } from './dto/verify-otp.dto'
-import dayjs from 'dayjs'
+import * as dayjs from 'dayjs'
 
 @Injectable()
 export class OtpService {
