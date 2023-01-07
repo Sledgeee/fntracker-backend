@@ -52,9 +52,10 @@ export class UserService {
 			egsId: dto.egsId,
 			country: dto.country
 		})
-		await this.profileSocialNetworksRepository.save({
+		profile.socialNetworks = await this.profileSocialNetworksRepository.save({
 			profile: profile
 		})
+		await this.profileRepository.save(profile)
 		return HttpStatus.OK
 	}
 

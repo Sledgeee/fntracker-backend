@@ -1,14 +1,14 @@
-import { IsNotEmpty } from 'class-validator'
+import { IsOptional } from 'class-validator'
 
 export class UpdateSocialNetworksDto {
-	@IsNotEmpty()
+	@IsOptional()
 	youtube: string
-	@IsNotEmpty()
+	@IsOptional()
 	twitch: string
-	@IsNotEmpty()
+	@IsOptional()
 	twitter: string
-	@IsNotEmpty()
+	@IsOptional()
 	instagram: string
-	@IsNotEmpty()
+	@IsOptional()
 	telegram: string
 }
