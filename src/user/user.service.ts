@@ -35,7 +35,7 @@ export class UserService {
 		const aLink = await this.alRepository.findOneBy({ userId: dto.uid })
 
 		if (!user) throw new BadRequestException(i18n.t('api-user.AccountDeleted'))
-		if (!aLink)
+		if (!aLink || user.isVerified)
 			throw new BadRequestException(i18n.t('api-user.AccountActivated'))
 		if (aLink.hash !== dto.hash)
 			throw new BadRequestException(i18n.t('api-user.IncorrectActivationLink'))
