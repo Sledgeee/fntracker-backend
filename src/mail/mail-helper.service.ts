@@ -18,12 +18,12 @@ export class MailHelperService {
 	) {}
 
 	async createActivationLink(userId, egsId, country, isResend) {
-		let link
+		let link: ActivationLinkEntity
 		if (!isResend) {
 			await this.activationLinkRepository.delete({ userId: userId })
 			link = this.activationLinkRepository.create({
 				userId: userId,
-				uid: v4(),
+				hash: v4(),
 				egsId: egsId,
 				country: country
 			})
@@ -34,11 +34,11 @@ export class MailHelperService {
 				userId: userId
 			},
 			{
-				uid: v4()
+				hash: v4()
 			}
 		)
 		link = await this.activationLinkRepository.findOneBy({ userId: userId })
-		return `${link.uid}&egsId=${link.egsId}&country=${link.country}`
+		return `user/activate?uid=${userId}&hash=${link.hash}&egsId=${link.egsId}&country=${link.country}`
 	}
 
 	async createRecoveryLink(email) {

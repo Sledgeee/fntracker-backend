@@ -1,13 +1,10 @@
-import {
-	BadRequestException,
-	Injectable,
-	NotFoundException
-} from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { ProfileEntity } from './entities/profile.entity'
 import { Repository } from 'typeorm'
 import { UpdateProfileDto, UpdateSocialNetworksDto } from './dto'
 import { ProfileSocialNetworksEntity } from './entities/profile-social-networks.entity'
+import { ProfileViewsEntity } from './entities/profile-views.entity'
 
 @Injectable()
 export class ProfileService {
@@ -15,40 +12,56 @@ export class ProfileService {
 		@InjectRepository(ProfileEntity)
 		private readonly profileRepository: Repository<ProfileEntity>,
 		@InjectRepository(ProfileSocialNetworksEntity)
-		private readonly profileSnRepository: Repository<ProfileSocialNetworksEntity>
+		private readonly profileSnRepository: Repository<ProfileSocialNetworksEntity>,
+		@InjectRepository(ProfileViewsEntity)
+		private readonly profileViewsRepository: Repository<ProfileViewsEntity>
 	) {}
 
 	async getProfile(egsId) {
 		const profile = await this.profileRepository.findOneBy({ egsId: egsId })
-		if (!profile) throw new NotFoundException('Profile not found')
-		return profile
+		let profileViews = await this.profileViewsRepository.findOneBy({
+			egsId: egsId
+		})
+		if (!profileViews) {
+			profileViews = await this.profileViewsRepository.save({
+				egsId: egsId,
+				count: 0
+			})
+		}
+		return {
+			profile: profile,
+			viewsCount: profileViews.count
+		}
 	}
 
 	async updateProfile(userId, dto: UpdateProfileDto) {
-		const profile = await this.profileRepository.findOneBy({ user: userId })
-		if (!profile) throw new BadRequestException('Profile doest not exists')
 		if (!dto) throw new BadRequestException('Empty object is passed')
-		profile.country = dto.country
-		profile.avatar = dto.avatar
-		profile.fullName = dto.fullName
-		return await this.profileRepository.save(profile)
+		return await this.profileRepository.update(
+			{
+				user: {
+					id: userId
+				}
+			},
+			{
+				...dto
+			}
+		)
 	}
 
 	async incrementViews(egsId) {
-		const profile = await this.profileRepository.findOneBy({ egsId: egsId })
-		if (!profile) {
-			const newProfile = this.profileRepository.create({
-				egsId: egsId,
-				viewsCount: 1
-			})
-			return await this.profileRepository.save(newProfile)
-		}
-		profile.viewsCount += 1
-		return await this.profileRepository.save(profile)
+		const pv = await this.profileViewsRepository.findOneBy({
+			egsId: egsId
+		})
+		pv.count += 1
+		return await this.profileViewsRepository.save(pv)
 	}
 
 	async updateProfileSocialNetworks(userId, dto: UpdateSocialNetworksDto) {
-		const profile = await this.profileRepository.findOneBy({ user: userId })
+		const profile = await this.profileRepository.findOneBy({
+			user: {
+				id: userId
+			}
+		})
 		if (!profile) throw new BadRequestException('Profile not found')
 		const sn = this.profileSnRepository.create({
 			profile: profile,

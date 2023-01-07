@@ -4,7 +4,7 @@ export class ActivateDto {
 	@IsNotEmpty()
 	uid: number
 	@IsNotEmpty()
-	al: string
+	hash: string
 	@IsNotEmpty()
 	egsId: string
 	@IsNotEmpty()

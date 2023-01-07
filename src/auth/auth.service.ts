@@ -39,9 +39,17 @@ export class AuthService {
 	) {}
 
 	async register(dto: RegisterDto, i18n: I18nContext): Promise<AuthResponse> {
-		const candidate = await this.userRepository.findOneBy({ email: dto.email })
+		const egsIdCandidate = await this.profileRepository.findOneBy({
+			egsId: dto.egsId
+		})
+		if (egsIdCandidate)
+			throw new BadRequestException(i18n.t('api-auth.EgsIdAlreadyTaken'))
 
-		if (candidate)
+		const emailCandidate = await this.userRepository.findOneBy({
+			email: dto.email
+		})
+
+		if (emailCandidate)
 			throw new BadRequestException(i18n.t('api-auth.EmailAlreadyTaken'))
 
 		const hashPass = await bcrypt.hash(dto.password, await bcrypt.genSalt(10))
@@ -59,12 +67,6 @@ export class AuthService {
 		)
 		newUser.hashedRt = await this.getHash(tokens.refreshToken)
 		await this.userRepository.save(newUser)
-
-		const egsIdCandidate = await this.profileRepository.findOneBy({
-			egsId: dto.egsId
-		})
-		if (egsIdCandidate)
-			throw new BadRequestException(i18n.t('api-auth.EgsIdAlreadyTaken'))
 
 		new Promise(() =>
 			this.mailService.sendActivationMail(

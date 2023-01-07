@@ -43,11 +43,9 @@ export class MailSmtpService {
 			country,
 			isResend
 		)
-		const link = `${this.configService.get(
-			'CLIENT_URL'
-		)}/user/activate?uid=${userId}&al=${al}`
+		const link = `${this.configService.get('CLIENT_URL')}/${al}`
 
-		return new Promise(() =>
+		new Promise(() =>
 			this.transporter.sendMail({
 				from: this.configService.get('MAIL_USER'),
 				to: to,
@@ -70,7 +68,7 @@ export class MailSmtpService {
 		)
 	}
 
-	async sendResetMail(
+	async sendRecoveryMail(
 		email: string,
 		i18n: I18nContext,
 		isResend: boolean = false

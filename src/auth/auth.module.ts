@@ -13,6 +13,7 @@ import { UserService } from '../user'
 import { MailSendgridService } from '../mail/mail-sendgrid.service'
 import { MailHelperService } from '../mail/mail-helper.service'
 import { OtpEntity } from '../otp/otp.entity'
+import { ProfileSocialNetworksEntity } from '../profile/entities/profile-social-networks.entity'
 
 @Module({
 	controllers: [AuthController],
@@ -30,7 +31,8 @@ import { OtpEntity } from '../otp/otp.entity'
 			UserEntity,
 			ActivationLinkEntity,
 			ProfileEntity,
-			OtpEntity
+			OtpEntity,
+			ProfileSocialNetworksEntity
 		]),
 		JwtModule.register({})
 	]

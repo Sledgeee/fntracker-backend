@@ -7,7 +7,7 @@ export class ActivationLinkEntity extends Base {
 	userId: number
 
 	@Column()
-	uid: string
+	hash: string
 
 	@Column()
 	egsId: string

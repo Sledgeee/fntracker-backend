@@ -13,6 +13,7 @@ import { ProfileEntity } from '../profile/entities/profile.entity'
 import { I18nContext } from 'nestjs-i18n'
 import { ConfigService } from '@nestjs/config'
 import { ActivateDto } from './dto'
+import { ProfileSocialNetworksEntity } from '../profile/entities/profile-social-networks.entity'
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,8 @@ export class UserService {
 		private readonly alRepository: Repository<ActivationLinkEntity>,
 		@InjectRepository(ProfileEntity)
 		private readonly profileRepository: Repository<ProfileEntity>,
+		@InjectRepository(ProfileSocialNetworksEntity)
+		private readonly profileSocialNetworksRepository: Repository<ProfileSocialNetworksEntity>,
 		@Inject(ConfigService)
 		private readonly configService: ConfigService
 	) {}
@@ -33,7 +36,7 @@ export class UserService {
 
 		if (!user) throw new BadRequestException(i18n.t('api-user.AccountDeleted'))
 		if (!aLink) throw new BadRequestException('api-user.AccountActivated')
-		if (aLink.uid !== dto.al)
+		if (aLink.hash !== dto.hash)
 			throw new BadRequestException(i18n.t('api-user.IncorrectActivationLink'))
 
 		const createdDate = dayjs(aLink.createdAt)
@@ -44,17 +47,18 @@ export class UserService {
 		user.isVerified = true
 		await this.userRepository.save(user)
 
-		const profile = this.profileRepository.create({
+		const profile = await this.profileRepository.save({
 			user: user,
 			egsId: dto.egsId,
-			viewsCount: 0,
 			country: dto.country
 		})
-		await this.profileRepository.save(profile)
+		await this.profileSocialNetworksRepository.save({
+			profile: profile
+		})
 		return HttpStatus.OK
 	}
 
-	async getProfile(id: number): Promise<UserEntity> {
+	async getProfile(id: number) {
 		return await this.userRepository.findOne({
 			where: {
 				id: id

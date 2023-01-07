@@ -29,9 +29,7 @@ export class MailSendgridService {
 			country,
 			isResend
 		)
-		const link = `${this.configService.get(
-			'CLIENT_URL'
-		)}/user/activate?uid=${userId}&al=${al}`
+		const link = `${this.configService.get('CLIENT_URL')}/${al}`
 		new Promise(() =>
 			SendGrid.send({
 				from: this.configService.get<string>('SEND_GRID_MAIL_BOX'),
@@ -55,7 +53,7 @@ export class MailSendgridService {
 		)
 	}
 
-	async sendResetMail(
+	async sendRecoveryMail(
 		email: string,
 		i18n: I18nContext,
 		isResend: boolean = false

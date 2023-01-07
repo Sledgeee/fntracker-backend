@@ -14,8 +14,8 @@ export class UserController {
 		return await this.userService.activateUser(dto, i18n)
 	}
 
-	@Get()
-	async getUser(@GetUserId() id: number) {
+	@Get('profile')
+	async getUser(@GetUserId() id) {
 		return this.userService.getProfile(id)
 	}
 }

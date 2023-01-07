@@ -5,21 +5,21 @@ import { Base } from '../../utils'
 @Entity('profile_social_networks')
 export class ProfileSocialNetworksEntity extends Base {
 	@OneToOne(() => ProfileEntity, profile => profile.id)
-	@JoinColumn({ name: 'user_id' })
+	@JoinColumn({ name: 'profile_id' })
 	profile: ProfileEntity
 
-	@Column()
+	@Column({ default: '' })
 	youtube: string
 
-	@Column()
+	@Column({ default: '' })
 	twitch: string
 
-	@Column()
+	@Column({ default: '' })
 	twitter: string
 
-	@Column()
+	@Column({ default: '' })
 	instagram: string
 
-	@Column()
+	@Column({ default: '' })
 	telegram: string
 }

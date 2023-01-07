@@ -17,9 +17,13 @@ export class UserEntity extends Base {
 	@Column({ nullable: true, name: 'hashed_rt' })
 	hashedRt?: string
 
-	@OneToOne(() => ProfileEntity, profile => profile.user)
+	@OneToOne(() => ProfileEntity, profile => profile.user, {
+		cascade: true
+	})
 	profile: ProfileEntity
 
-	@OneToMany(() => SubscriptionEntity, subscription => subscription.user)
+	@OneToMany(() => SubscriptionEntity, subscription => subscription.user, {
+		cascade: true
+	})
 	subscriptions: SubscriptionEntity[]
 }

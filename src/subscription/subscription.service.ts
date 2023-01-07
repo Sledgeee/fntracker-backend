@@ -12,26 +12,34 @@ export class SubscriptionService {
 
 	async getSubscriptions(userId) {
 		return await this.subscriptionRepository.findBy({
-			user: userId
+			user: {
+				id: userId
+			}
 		})
 	}
 
 	async subscribe(userId, shopItemId: string) {
 		const candidate = await this.subscriptionRepository.findOneBy({
-			user: userId,
+			user: {
+				id: userId
+			},
 			shopItemId: shopItemId
 		})
 		if (candidate) throw new BadRequestException('')
 		const subscription = await this.subscriptionRepository.create({
 			shopItemId: shopItemId,
-			user: userId
+			user: {
+				id: userId
+			}
 		})
 		await this.subscriptionRepository.save(subscription)
 	}
 
-	async unsubscribe(user, shopItemId: string) {
+	async unsubscribe(userId, shopItemId: string) {
 		await this.subscriptionRepository.delete({
-			user: user,
+			user: {
+				id: userId
+			},
 			shopItemId: shopItemId
 		})
 	}

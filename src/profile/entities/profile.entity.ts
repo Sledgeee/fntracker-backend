@@ -7,27 +7,23 @@ import { ProfileSocialNetworksEntity } from './profile-social-networks.entity'
 export class ProfileEntity extends Base {
 	@OneToOne(() => UserEntity, user => user.id)
 	@JoinColumn({ name: 'user_id' })
-	user?: UserEntity
+	user: UserEntity
 
-	@OneToOne(
-		() => ProfileSocialNetworksEntity,
-		socialNetworks => socialNetworks.profile
-	)
+	@Column({ name: 'egs_id', unique: true })
+	egsId: string
+
+	@OneToOne(() => ProfileSocialNetworksEntity, psn => psn.id, {
+		cascade: true
+	})
 	@JoinColumn({ name: 'social_networks' })
 	socialNetworks: ProfileSocialNetworksEntity
 
-	@Column({ name: 'egs_id', unique: true, nullable: false })
-	egsId: string
-
-	@Column({ name: 'views_count' })
-	viewsCount: number
-
-	@Column({ nullable: true })
+	@Column({ nullable: false })
 	country: string
 
-	@Column({ nullable: true })
+	@Column({ default: '' })
 	avatar: string
 
-	@Column({ nullable: true })
+	@Column({ default: '' })
 	fullName: string
 }
