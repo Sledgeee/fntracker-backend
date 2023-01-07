@@ -77,13 +77,15 @@ export class UserService {
 			isVerified: false
 		})
 		if (!users || users.length === 0) return
-		const usersToDelete: number[] = []
-		users.forEach(user => {
-			const createdDate = dayjs(user.createdAt)
-			if (createdDate.diff(now, 'day', false) >= 7) {
-				usersToDelete.push(user.id)
-			}
+		new Promise(() => {
+			const usersToDelete: number[] = []
+			users.forEach(user => {
+				const createdDate = dayjs(user.createdAt)
+				if (createdDate.diff(now, 'day', false) >= 7) {
+					usersToDelete.push(user.id)
+				}
+			})
+			this.userRepository.delete(usersToDelete)
 		})
-		await this.userRepository.delete(usersToDelete)
 	}
 }
