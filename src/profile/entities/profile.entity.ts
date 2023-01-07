@@ -12,7 +12,7 @@ export class ProfileEntity extends Base {
 	@Column({ name: 'egs_id', unique: true })
 	egsId: string
 
-	@Column()
+	@Column({ default: '' })
 	gradient: string
 
 	@OneToOne(() => ProfileSocialNetworksEntity, psn => psn.id, {

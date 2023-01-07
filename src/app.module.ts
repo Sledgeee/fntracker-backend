@@ -9,7 +9,6 @@ import { AtGuard } from './common/guards'
 import { MailModule } from './mail'
 import { SubscriptionModule } from './subscription'
 import { ScheduleModule } from '@nestjs/schedule'
-import { AppService } from './app.service'
 import { ProfileModule } from './profile'
 import { CookieResolver, I18nModule } from 'nestjs-i18n'
 import { PrModule } from './pr'
@@ -44,7 +43,6 @@ import { OtpModule } from './otp/otp.module'
 		OtpModule
 	],
 	providers: [
-		AppService,
 		{
 			provide: APP_GUARD,
 			useClass: AtGuard

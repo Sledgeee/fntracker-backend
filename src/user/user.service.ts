@@ -14,6 +14,7 @@ import { I18nContext } from 'nestjs-i18n'
 import { ConfigService } from '@nestjs/config'
 import { ActivateDto } from './dto'
 import { ProfileSocialNetworksEntity } from '../profile/entities/profile-social-networks.entity'
+import { Cron } from '@nestjs/schedule'
 
 @Injectable()
 export class UserService {
@@ -67,5 +68,22 @@ export class UserService {
 			},
 			relations: ['profile', 'profile.socialNetworks', 'subscriptions']
 		})
+	}
+
+	@Cron('0 0 * * *')
+	async cleanNonVerifiedUsers() {
+		const now = dayjs()
+		const users = await this.userRepository.findBy({
+			isVerified: false
+		})
+		if (!users || users.length === 0) return
+		const usersToDelete: number[] = []
+		users.forEach(user => {
+			const createdDate = dayjs(user.createdAt)
+			if (createdDate.diff(now, 'day', false) >= 7) {
+				usersToDelete.push(user.id)
+			}
+		})
+		await this.userRepository.delete(usersToDelete)
 	}
 }
