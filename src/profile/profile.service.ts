@@ -18,7 +18,12 @@ export class ProfileService {
 	) {}
 
 	async getProfile(egsId) {
-		const profile = await this.profileRepository.findOneBy({ egsId: egsId })
+		const profile = await this.profileRepository.findOne({
+			where: {
+				egsId: egsId
+			},
+			relations: ['socialNetworks']
+		})
 		let profileViews = await this.profileViewsRepository.findOneBy({
 			egsId: egsId
 		})
