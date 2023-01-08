@@ -63,10 +63,13 @@ export class ProfileService {
 			}
 		})
 		if (!profile) throw new BadRequestException('Profile not found')
-		const sn = this.profileSnRepository.create({
-			profile: profile,
-			...dto
-		})
-		return await this.profileSnRepository.save(sn)
+		return await this.profileSnRepository.update(
+			{
+				profile: profile
+			},
+			{
+				...dto
+			}
+		)
 	}
 }
