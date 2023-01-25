@@ -201,21 +201,25 @@ export class AuthService {
 
 	setCookie(response: Response, refreshToken: string) {
 		response.cookie('fntracker-authorized', true, {
-			maxAge: this.configService.get('JWT_RT_EXP_COOKIE')
+			maxAge: this.configService.get('JWT_RT_EXP_COOKIE'),
+            sameSite: 'none'
 		})
 		response.cookie('fntracker-rt', refreshToken, {
 			maxAge: this.configService.get('JWT_RT_EXP_COOKIE'),
-			httpOnly: true
+			httpOnly: true,
+            sameSite: 'none'
 		})
 	}
 
 	clearCookie(response: Response) {
 		response.cookie('fntracker-authorized', null, {
-			maxAge: 0
+			maxAge: 0,
+            sameSite: 'none'
 		})
 		response.cookie('fntracker-rt', null, {
 			maxAge: 0,
-			httpOnly: true
+			httpOnly: true,
+            sameSite: 'none'
 		})
 	}
 }
